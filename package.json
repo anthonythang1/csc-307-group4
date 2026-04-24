@@ -1,0 +1,23 @@
+{
+  "name": "rental-registry",
+  "version": "1.0.0",
+  "description": "``` Anthony Thang  Aden Ou Connor Wilson Ruben Saghian ``` [Collaborative Document](https://docs.google.com/document/d/16KtSuRc8W66EhsFaRmkawnPUJ5UftmuBYQQK6qXvPyE/edit?tab=t.0)",
+  "homepage": "https://github.com/anthonythang1/csc-307-group4#readme",
+  "bugs": {
+    "url": "https://github.com/anthonythang1/csc-307-group4/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anthonythang1/csc-307-group4.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.3"
+  }
+}
