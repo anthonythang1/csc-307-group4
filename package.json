@@ -15,7 +15,9 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json}' --config ./.prettierrc"
+    "backend": "cd packages/backend && ./mvnw spring-boot:run",
+    "frontend": "cd packages/react-ts-frontend && npm run dev",
+    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json,java}' --config ./.prettierrc"
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.5",
