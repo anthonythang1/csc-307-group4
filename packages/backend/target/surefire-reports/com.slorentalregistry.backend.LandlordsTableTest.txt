@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.slorentalregistry.backend.LandlordsTableTest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.399 s -- in com.slorentalregistry.backend.LandlordsTableTest
