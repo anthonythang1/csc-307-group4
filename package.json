@@ -17,7 +17,8 @@
   "scripts": {
     "backend": "cd packages/backend && ./mvnw spring-boot:run",
     "frontend": "cd packages/react-ts-frontend && npm run dev",
-    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json,java}' --config ./.prettierrc"
+    "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,md,json,java}' --config ./.prettierrc",
+    "backbug": "cd packages/backend && ./mvnw spring-boot:run --debug"
   },
   "devDependencies": {
     "@eslint/compat": "^2.0.5",
