@@ -14,12 +14,12 @@
   "dependencies": {
     "@chakra-ui/react": "^3.35.0",
     "@emotion/react": "^11.14.0",
-    "@react-oauth/google": "^0.13.5",
     "@supabase/supabase-js": "^2.105.3",
     "@tailwindcss/postcss": "^4.2.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
-    "react-router-dom": "^7.15.0"
+    "react-router-dom": "^7.15.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

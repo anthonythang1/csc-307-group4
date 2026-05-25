@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   Center,
   Heading,
@@ -14,7 +15,8 @@ import {
   USER_TYPES,
   PAGE_CONTENT
 } from "@/constants/homePageConstants.ts";
-import React from "react";
+import { useAuth } from "@/auth/useAuth";
+import React, { useState } from "react";
 
 type CardProps = {
   title: string;
@@ -54,9 +56,47 @@ function StepItem({ color, desc, num }: StepItemProps) {
   );
 }
 
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Something went wrong.";
+}
+
 export default function Home() {
+  const { signOut, user } = useAuth();
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState("");
+
+  const handleSignOut = async () => {
+    setSignOutError("");
+    setSigningOut(true);
+
+    try {
+      await signOut();
+    } catch (error) {
+      setSignOutError(getErrorMessage(error));
+    } finally {
+      setSigningOut(false);
+    }
+  };
+
   return (
     <Center>
+      {user ? (
+        <Box position="fixed" top="4" right="4" zIndex="1" textAlign="right">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleSignOut}
+            disabled={signingOut}>
+            {signingOut ? "Signing out..." : "Sign Out"}
+          </Button>
+          {signOutError ? (
+            <Text mt="2" fontSize="sm" color="red.600">
+              {signOutError}
+            </Text>
+          ) : null}
+        </Box>
+      ) : null}
+
       <VStack gap="8">
         <Box
           textAlign="center"

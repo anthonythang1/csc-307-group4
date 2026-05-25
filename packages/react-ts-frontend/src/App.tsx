@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ProtectedRoute } from "./auth/ProtectedRoute.tsx";
 import Home from "./pages/Home.tsx";
 import Login from "./pages/Login.tsx";
 import PropertyRegisterLL from "./pages/Form_PropRegLandlord.tsx"; 
@@ -11,8 +12,15 @@ export default function App() {
 			<Routes>
 				<Route path="/" element={<Home />} />
 				<Route path="/login" element={<Login />} />
-				<Route path="/signup" element={<Login />} />
-				<Route path="/propertyreg" element={<PropertyRegisterLL />} />
+				<Route path="/signup" element={<Login startOnSignUp />} />
+				<Route
+					path="/propertyreg"
+					element={
+						<ProtectedRoute>
+							<PropertyRegisterLL />
+						</ProtectedRoute>
+					}
+				/>
 			</Routes>
 </BrowserRouter>
 );

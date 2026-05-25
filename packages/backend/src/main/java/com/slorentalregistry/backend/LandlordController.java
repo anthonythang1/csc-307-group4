@@ -1,8 +1,14 @@
 package com.slorentalregistry.backend;
 
+import com.slorentalregistry.backend.properties.PropertyRegistrationService;
+import com.slorentalregistry.backend.properties.PropertyRegistrationService.PropertyRegistrationRequest;
+import com.slorentalregistry.backend.properties.PropertyRegistrationService.PropertyRegistrationResponse;
+import java.sql.SQLException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.*;
 
@@ -15,22 +21,46 @@ public class LandlordController
 	
 	/* ~~ or send to backend instead ~~ */
 	private final PropertyService service; 
-	public LandlordController(PropertyService service){
+	private final PropertyRegistrationService propertyRegistrationService;
+
+	public LandlordController(
+		PropertyService service,
+		PropertyRegistrationService propertyRegistrationService
+	){
 		this.service = service;
+		this.propertyRegistrationService = propertyRegistrationService;
 	}
 
 	/* ~~ post : landlord property ~~ */
     @PostMapping("/propertyreg")
-    public ResponseEntity<?> registerProperty(@RequestBody PropertyDto property)
+    public ResponseEntity<?> registerProperty(
+		@AuthenticationPrincipal Jwt jwt,
+		@RequestBody PropertyDto property
+	)
+		throws SQLException
 	{
-		// ~ local storage (debug) ~
-		//tempstore.add(property);
-		
-		PropertyTable saved = service.saveFromDto(property);
+		PropertyRegistrationResponse saved =
+			propertyRegistrationService.createProperty(
+				jwt,
+				new PropertyRegistrationRequest(
+					property.getPropID() == null ? null : property.getPropID().toString(),
+					property.getPropAddress(),
+					property.getPropCity(),
+					property.getPropZipcode(),
+					property.getPropZoning(),
+					property.getPropNumBeds(),
+					property.getPropNumBaths(),
+					property.getPropSqft(),
+					property.getPropYearBuilt(),
+					property.getPropOwnerEmail(),
+					property.getPropOwnerPhone()
+				)
+			);
 
 		Map<String,Object> resp = new HashMap<>();
 		resp.put("message", "Property registered");
-		resp.put("id", saved.getPropID());
+		resp.put("id", saved.propertyId());
+		resp.put("landlordId", saved.landlordId());
 
 		return new ResponseEntity<>(resp, HttpStatus.CREATED);
 	}
@@ -49,4 +79,3 @@ public class LandlordController
 		return service.listAll();
 	}
 }
-
