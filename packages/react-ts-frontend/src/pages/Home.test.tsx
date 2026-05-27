@@ -1,6 +1,7 @@
 import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import { describe, expect } from "vitest";
+import { beforeEach, describe, expect, vi } from "vitest";
 import { renderWithProviders } from "@/../test/test-utils.tsx";
 import Home from "./Home";
 import {
@@ -9,7 +10,22 @@ import {
   PAGE_CONTENT
 } from "@/constants/homePageConstants";
 
+const { mockSignOut } = vi.hoisted(() => ({
+  mockSignOut: vi.fn()
+}));
+
+vi.mock("@/auth/useAuth", () => ({
+  useAuth: () => ({
+    signOut: mockSignOut,
+    user: { email: "landlord@example.com" }
+  })
+}));
+
 describe("Home Page", () => {
+  beforeEach(() => {
+    mockSignOut.mockReset();
+  });
+
   test("renders all content", () => {
     renderWithProviders(<Home />);
     expect(
@@ -47,5 +63,13 @@ describe("Home Page", () => {
         expect(screen.getByText(step)).toBeInTheDocument();
       });
     });
+  });
+
+  test("signs out from the home page", async () => {
+    renderWithProviders(<Home />);
+
+    await userEvent.click(screen.getByRole("button", { name: /sign out/i }));
+
+    expect(mockSignOut).toHaveBeenCalledOnce();
   });
 });

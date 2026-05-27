@@ -1,6 +1,12 @@
-import { useState } from 'react' 
+import { useState, type ChangeEvent, type FormEvent } from 'react' 
 import styles from "./PropertyForm.module.css"
-import { readCookie } from '../utils/cookies'
+import { apiFetch } from '../lib/api'
+import {
+	propertyRegistrationSchema,
+	zodErrorMap,
+} from '../lib/formValidation'
+
+type NumericFormValue = number | "";
 
 /* ~~~~ data types ~~~~ */
 type PropertyFormState = {
@@ -8,9 +14,9 @@ type PropertyFormState = {
 	propAddress:	string,
 	propCity:		string,
 	propZipcode:	string,
-	propNumBeds:	number,
-	propNumBaths:	number,
-	propSqft:		number,
+	propNumBeds:	NumericFormValue,
+	propNumBaths:	NumericFormValue,
+	propSqft:		NumericFormValue,
 	propYearBuilt:	string,
 	propZoning:		string,
 	propOwnerEmail:	string,
@@ -39,7 +45,7 @@ export default function PropertyRegisterLL() {
 	const [errors, setErrors] = useState<Partial<Record<keyof PropertyFormState, string>>>({});
 
 	/* ~~ handle input changes and type the event as HTML input ~~ */
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const {name, value, type} = e.target; 
 		const key = name as keyof PropertyFormState;
 
@@ -53,69 +59,30 @@ export default function PropertyRegisterLL() {
 		setErrors(prev => ({ ...prev, [key]: undefined }));
 	};
 
-	/* ~~ Ensure required data is entered in correct range ~~ */
-	const validate = (data: PropertyFormState) => {
-		const err: typeof errors = {};
-
-		/* empty address */
-		if(!data.propAddress.trim()) {
-			err.propAddress = "Address is required";
-		}
-
-		/* empty city */
-		if(!data.propCity.trim()) {
-			err.propCity = "City is required";
-		}
-
-		/* empty zip */
-		if(!data.propZipcode.trim()) {
-			err.propZipcode = "Zipcode is required";
-		}
-
-		/* invalid integer values */
-		if(!Number.isInteger(data.propNumBeds) || data.propNumBeds < 0) {
-			err.propNumBeds = "Invalid number of beds.";
-		}
-		if(!Number.isInteger(data.propNumBaths) || data.propNumBaths < 0) {
-
-			err.propNumBaths = "Invalid number of baths.";
-		}
-
-		return err;
-	}
-
-
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: FormEvent) => {
 
 		/* prevent browsers default submission-and-reload behavior */
 		e.preventDefault();
 
-		/* collect errors found in validate() */
-		const v = validate(form);
+		const validated = propertyRegistrationSchema.safeParse(form);
 
 		/* show errors and exit if errors found */
-		if(Object.keys(v).length) { setErrors(v); return; }
+		if(!validated.success) {
+			setErrors(zodErrorMap(validated.error));
+			return;
+		}
 
 		/* POST : send data to backend */
 		try {
 
-			/* ensure the correct datatypes are passed */
-			const payload = {
-				...form, 
-				propNumBeds: 	Number(form.propNumBeds), 
-				propNumBaths:	Number(form.propNumBaths),
-				propSqft:		Number(form.propSqft),
-			};
+			const payload = validated.data;
 
-			const res = await fetch(
-				"http://localhost:8080/api/propertyreg",
+			const res = await apiFetch(
+				"/api/properties",
 				{
 					method: "POST",
-					credentials: "include",							//send session and csrf cookie
 					headers: {
 						"Content-Type":"application/json",
-						//...(xsrf ? {'X-XSRF-TOKEN' : decodeURIComponent(xsrf) } : {} ) // decode that cookie
-						"X-XSRF-TOKEN": readCookie('XSRF-TOKEN') || ''
 					},
 					body: JSON.stringify(payload)
 				}
@@ -123,10 +90,18 @@ export default function PropertyRegisterLL() {
 
 			if(!res.ok)
 			{
+				if (res.status === 409) {
+					setErrors(prev => ({
+						...prev,
+						propAddress: "This property is already registered."
+					}));
+					return;
+				}
+
 				throw new Error(`Server error: ${res.status}`);
 			}
 
-			console.log("Property submitted:", form);
+			console.log("Property submitted:", payload);
 			alert("Submitted!");
 
 			/* clear form */
@@ -350,5 +325,3 @@ export default function PropertyRegisterLL() {
 		</form>
 	);
 }
-
-
