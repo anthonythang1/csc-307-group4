@@ -4,6 +4,7 @@ import {
   ChakraProvider,
   defaultSystem
 } from "@chakra-ui/react";
+import { MemoryRouter } from "react-router-dom";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function AllProviders({
@@ -13,7 +14,7 @@ function AllProviders({
 }) {
   return (
     <ChakraProvider value={defaultSystem}>
-      {children}
+      <MemoryRouter>{children}</MemoryRouter>
     </ChakraProvider>
   );
 }

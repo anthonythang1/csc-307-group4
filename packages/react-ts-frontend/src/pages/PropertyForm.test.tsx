@@ -69,6 +69,12 @@ describe("PropertyRegisterLL form", () => {
     	const [url, options] = mockFetch.mock.calls[0] as unknown as [string, RequestInit];
     	expect(url).toMatch(/\/api\/propertyreg$/);
     	const body = JSON.parse((options.body as string) || '{}');
+    	const [url, options] = mockFetch.mock.calls[0] as unknown as [
+			RequestInfo | URL,
+			RequestInit
+		];
+		expect(url).toMatch(/\/api\/properties$/);
+    	const body = JSON.parse(String(options.body));
     	expect(body).toEqual(expect.objectContaining({
       		propAddress: "123 Main St",
       		propCity: "Townsville",
@@ -82,6 +88,40 @@ describe("PropertyRegisterLL form", () => {
       		propOwnerPhone: "555-1234"
     	}));
   	});
+
+	test("shows zod validation errors and does not submit invalid property data", async () => {
+		const mockFetch = vi.fn(() =>
+			Promise.resolve({ ok: true, json: async () => ({ success: true }) })
+		);
+		vi.stubGlobal("fetch", mockFetch);
+
+		renderWithProviders(<PropertyRegisterLL />);
+
+		await fillBasicValid();
+		await userEvent.clear(screen.getByLabelText(/Zipcode\*/i));
+		await userEvent.type(screen.getByLabelText(/Zipcode\*/i), "abc");
+		await userEvent.type(screen.getByLabelText(/Owner's Email/i), "not-an-email");
+
+		await userEvent.click(screen.getByRole("button", { name: /save property/i }));
+
+		expect(await screen.findByText(/Enter a valid zipcode/i)).toBeInTheDocument();
+		expect(await screen.findByText(/Enter a valid owner email/i)).toBeInTheDocument();
+		expect(mockFetch).not.toHaveBeenCalled();
+	});
+
+	test("shows duplicate property error on conflict response", async () => {
+		const mockFetch = vi.fn(() => Promise.resolve({ ok: false, status: 409 }));
+		vi.stubGlobal("fetch", mockFetch);
+
+		renderWithProviders(<PropertyRegisterLL />);
+
+		await fillBasicValid();
+		await userEvent.click(screen.getByRole("button", { name: /save property/i }));
+
+		expect(
+			await screen.findByText(/This property is already registered/i)
+		).toBeInTheDocument();
+	});
 
   test("displays server error alert on non-ok response", async () => {
     const mockFetch = vi.fn(() => Promise.resolve({ ok: false, status: 500 }));
@@ -98,4 +138,3 @@ describe("PropertyRegisterLL form", () => {
     alertSpy.mockRestore();
   });
 });
-
