@@ -19,7 +19,7 @@ const styles: Record<string, CSSProperties> = {
   header: {
     backgroundColor: "#ffffff",
     borderBottom: "1px solid #e5e7eb",
-    padding: "24px 28px 32px",
+    padding: "14px 30px 28px",
   },
 
   headerInner: {
@@ -32,49 +32,49 @@ const styles: Record<string, CSSProperties> = {
     color: "#2563eb",
     textDecoration: "none",
     fontSize: "14px",
-    marginBottom: "12px",
+    marginBottom: "10px",
   },
 
   title: {
     margin: 0,
-    fontSize: "32px",
-    lineHeight: "1.15",
+    fontSize: "30px",
+    lineHeight: "1.1",
     fontWeight: 800,
     letterSpacing: "-0.04em",
   },
 
   subtitle: {
-    marginTop: "8px",
+    marginTop: "10px",
     marginBottom: 0,
-    color: "#64748b",
+    color: "#475569",
     fontSize: "16px",
   },
 
   main: {
     maxWidth: "1180px",
     margin: "0 auto",
-    padding: "34px 28px",
-  },
-
-  message: {
-    marginBottom: "18px",
-    color: "#64748b",
+    padding: "34px 30px 46px",
   },
 
   error: {
-    marginBottom: "18px",
+    marginBottom: "24px",
     color: "#dc2626",
     backgroundColor: "#fef2f2",
     border: "1px solid #fecaca",
     borderRadius: "10px",
-    padding: "12px 14px",
+    padding: "14px 16px",
+  },
+
+  message: {
+    color: "#64748b",
+    fontSize: "15px",
   },
 
   statGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
     gap: "26px",
-    marginBottom: "34px",
+    marginBottom: "38px",
   },
 
   card: {
@@ -84,11 +84,19 @@ const styles: Record<string, CSSProperties> = {
     padding: "26px",
   },
 
+  statCard: {
+    backgroundColor: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "14px",
+    padding: "26px",
+    minHeight: "110px",
+  },
+
   statTop: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: "28px",
+    marginBottom: "30px",
   },
 
   statTitle: {
@@ -118,9 +126,17 @@ const styles: Record<string, CSSProperties> = {
 
   chartGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))",
     gap: "26px",
     marginBottom: "26px",
+  },
+
+  chartCard: {
+    backgroundColor: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "14px",
+    padding: "26px",
+    minHeight: "360px",
   },
 
   panelTitle: {
@@ -131,7 +147,7 @@ const styles: Record<string, CSSProperties> = {
 
   panelSubtitle: {
     marginTop: "8px",
-    marginBottom: "22px",
+    marginBottom: "28px",
     color: "#73778a",
     fontSize: "15px",
   },
@@ -142,15 +158,25 @@ const styles: Record<string, CSSProperties> = {
     gap: "18px",
     height: "260px",
     paddingTop: "20px",
+    paddingLeft: "10px",
+    borderLeft: "1px solid #d1d5db",
+    borderBottom: "1px solid #d1d5db",
   },
 
   pieWrapper: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: "32px",
+    gap: "34px",
     minHeight: "260px",
     flexWrap: "wrap",
+  },
+
+  pieChart: {
+    width: "185px",
+    height: "185px",
+    borderRadius: "50%",
+    border: "1px solid #e5e7eb",
   },
 
   legend: {
@@ -166,11 +192,24 @@ const styles: Record<string, CSSProperties> = {
     color: "#334155",
   },
 
+  insightCard: {
+    backgroundColor: "#ffffff",
+    border: "1px solid #e5e7eb",
+    borderRadius: "14px",
+    padding: "26px",
+  },
+
   insightRow: {
     display: "flex",
     alignItems: "flex-start",
     gap: "14px",
-    marginBottom: "16px",
+    marginBottom: "18px",
+  },
+
+  insightIcon: {
+    color: "#16a34a",
+    fontSize: "18px",
+    lineHeight: "1.2",
   },
 
   insightTitle: {
@@ -200,7 +239,7 @@ type StatCardProps = {
 
 function StatCard({ title, value, change, icon }: StatCardProps) {
   return (
-    <div style={styles.card}>
+    <div style={styles.statCard}>
       <div style={styles.statTop}>
         <p style={styles.statTitle}>{title}</p>
         <span style={styles.statIcon}>{icon}</span>
@@ -217,13 +256,13 @@ function PropertiesByCityChart({ data }: { data: PropertiesByCity[] }) {
     return <p style={styles.message}>No property data available yet.</p>;
   }
 
-  const visibleData = data.slice(0, 8);
+  const visibleData = data.slice(0, 5);
   const maxCount = Math.max(...visibleData.map((item) => item.propertyCount), 1);
 
   return (
     <div style={styles.barChart}>
       {visibleData.map((item) => {
-        const heightPercent = Math.max((item.propertyCount / maxCount) * 100, 4);
+        const heightPercent = Math.max((item.propertyCount / maxCount) * 100, 6);
 
         return (
           <div
@@ -244,20 +283,18 @@ function PropertiesByCityChart({ data }: { data: PropertiesByCity[] }) {
 
             <div
               style={{
-                width: "100%",
-                maxWidth: "72px",
+                width: "78%",
                 height: `${heightPercent}%`,
                 backgroundColor: "#3b82f6",
-                borderRadius: "8px 8px 0 0",
               }}
             />
 
             <span
               style={{
                 fontSize: "12px",
-                color: "#64748b",
+                color: "#737373",
                 textAlign: "center",
-                minHeight: "32px",
+                minHeight: "34px",
               }}
             >
               {item.city}
@@ -274,7 +311,7 @@ function BedroomDistributionChart({ data }: { data: BedroomDistribution[] }) {
     return <p style={styles.message}>No bedroom distribution data available.</p>;
   }
 
-  const colors = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"];
+  const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
   const total = data.reduce((sum, item) => sum + item.count, 0);
 
   let start = 0;
@@ -297,11 +334,8 @@ function BedroomDistributionChart({ data }: { data: BedroomDistribution[] }) {
     <div style={styles.pieWrapper}>
       <div
         style={{
-          width: "180px",
-          height: "180px",
-          borderRadius: "50%",
+          ...styles.pieChart,
           background: pieBackground,
-          border: "1px solid #e5e7eb",
         }}
       />
 
@@ -315,14 +349,14 @@ function BedroomDistributionChart({ data }: { data: BedroomDistribution[] }) {
                 style={{
                   width: "10px",
                   height: "10px",
-                  borderRadius: "50%",
+                  borderRadius: "999px",
                   display: "inline-block",
                   backgroundColor: colors[index % colors.length],
                 }}
               />
 
               <span>
-                {item.label}: {item.count.toLocaleString()} ({percent}%)
+                {item.label} {percent}%
               </span>
             </div>
           );
@@ -386,61 +420,63 @@ function Dashboard() {
       </header>
 
       <main style={styles.main}>
-        {loading ? <p style={styles.message}>Loading dashboard data...</p> : null}
-
         {error ? <p style={styles.error}>{error}</p> : null}
 
         <section style={styles.statGrid}>
           <StatCard
             title="Total Registered Properties"
-            value={formatNumber(stats?.totalRegisteredProperties)}
-            change={loading ? "Loading..." : "From public.properties"}
+            value={loading ? "—" : formatNumber(stats?.totalRegisteredProperties)}
+            change="From public.properties"
             icon="▦"
           />
 
           <StatCard
             title="Cities Represented"
-            value={formatNumber(stats?.totalCities)}
-            change={loading ? "Loading..." : "Grouped by city"}
+            value={loading ? "—" : formatNumber(stats?.totalCities)}
+            change="Grouped by city"
             icon="⌂"
           />
 
           <StatCard
             title="Average Beds"
-            value={formatNumber(stats?.averageBeds)}
-            change={loading ? "Loading..." : "Average from beds column"}
+            value={loading ? "—" : formatNumber(stats?.averageBeds)}
+            change="Average from beds column"
             icon="BR"
           />
 
           <StatCard
             title="Average Sqft"
-            value={formatNumber(stats?.averageSqft)}
-            change={loading ? "Loading..." : "Average from sqft column"}
+            value={loading ? "—" : formatNumber(stats?.averageSqft)}
+            change="Average from sqft column"
             icon="□"
           />
         </section>
 
         <section style={styles.chartGrid}>
-          <div style={styles.card}>
+          <div style={styles.chartCard}>
             <h2 style={styles.panelTitle}>Properties by City</h2>
             <p style={styles.panelSubtitle}>
-              Count of registered properties grouped by the city column
+              Count of registered properties grouped by city
             </p>
 
             <PropertiesByCityChart data={dashboardData?.propertiesByCity ?? []} />
           </div>
 
-          <div style={styles.card}>
-            <h2 style={styles.panelTitle}>Properties by Bedroom Count</h2>
+          <div style={styles.chartCard}>
+            <h2 style={styles.panelTitle}>
+              Unit Distribution by Bedroom Count
+            </h2>
             <p style={styles.panelSubtitle}>
-              Breakdown of registered properties using the beds column
+              Breakdown of registered properties by size
             </p>
 
-            <BedroomDistributionChart data={dashboardData?.bedroomDistribution ?? []} />
+            <BedroomDistributionChart
+              data={dashboardData?.bedroomDistribution ?? []}
+            />
           </div>
         </section>
 
-        <section style={styles.card}>
+        <section style={styles.insightCard}>
           <h2 style={styles.panelTitle}>Key Insights</h2>
           <p style={styles.panelSubtitle}>
             Data-driven observations from the property registry
@@ -448,7 +484,7 @@ function Dashboard() {
 
           {(dashboardData?.insights ?? []).map((insight) => (
             <div key={insight.title} style={styles.insightRow}>
-              <span style={{ color: "#2563eb" }}>●</span>
+              <span style={styles.insightIcon}>↗</span>
 
               <div>
                 <p style={styles.insightTitle}>{insight.title}</p>
