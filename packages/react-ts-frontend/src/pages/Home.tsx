@@ -17,6 +17,7 @@ import {
 } from "@/constants/homePageConstants.ts";
 import { useAuth } from "@/auth/useAuth";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 type CardProps = {
   title: string;
@@ -95,7 +96,16 @@ export default function Home() {
             </Text>
           ) : null}
         </Box>
-      ) : null}
+      ) : (
+        <HStack position="fixed" top="4" right="4" zIndex="1">
+          <Button asChild variant="outline">
+            <Link to="/login">Log In</Link>
+          </Button>
+          <Button asChild colorPalette="blue">
+            <Link to="/signup">Sign Up</Link>
+          </Button>
+        </HStack>
+      )}
 
       <VStack gap="8">
         <Box

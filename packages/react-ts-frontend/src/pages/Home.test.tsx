@@ -1,29 +1,35 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
-import { beforeEach, describe, expect, vi } from "vitest";
-import { renderWithProviders } from "@/../test/test-utils.tsx";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { renderWithProviders } from "../../test/test-utils";
 import Home from "./Home";
 import {
   FEATURE_CARDS,
   USER_TYPES,
   PAGE_CONTENT
-} from "@/constants/homePageConstants";
+} from "../constants/homePageConstants";
 
 const { mockSignOut } = vi.hoisted(() => ({
   mockSignOut: vi.fn()
+}));
+const { mockAuthState } = vi.hoisted(() => ({
+  mockAuthState: {
+    user: { email: "landlord@example.com" } as { email: string } | null
+  }
 }));
 
 vi.mock("@/auth/useAuth", () => ({
   useAuth: () => ({
     signOut: mockSignOut,
-    user: { email: "landlord@example.com" }
+    user: mockAuthState.user
   })
 }));
 
 describe("Home Page", () => {
   beforeEach(() => {
     mockSignOut.mockReset();
+    mockAuthState.user = { email: "landlord@example.com" };
   });
 
   test("renders all content", () => {
@@ -71,5 +77,20 @@ describe("Home Page", () => {
     await userEvent.click(screen.getByRole("button", { name: /sign out/i }));
 
     expect(mockSignOut).toHaveBeenCalledOnce();
+  });
+
+  test("links signed-out visitors to login and signup forms", () => {
+    mockAuthState.user = null;
+
+    renderWithProviders(<Home />);
+
+    expect(screen.getByRole("link", { name: /log in/i })).toHaveAttribute(
+      "href",
+      "/login"
+    );
+    expect(screen.getByRole("link", { name: /sign up/i })).toHaveAttribute(
+      "href",
+      "/signup"
+    );
   });
 });
