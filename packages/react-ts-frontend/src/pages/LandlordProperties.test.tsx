@@ -49,7 +49,8 @@ function renderPage() {
         <Route path="/" element={<p>Home page</p>} />
         <Route path="/landlord/properties" element={<LandlordProperties />} />
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
+    { withRouter: false }
   );
 }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { render } from "@testing-library/react";
+import { type RenderOptions, render } from "@testing-library/react";
 import {
   ChakraProvider,
   defaultSystem
@@ -8,17 +8,32 @@ import { MemoryRouter } from "react-router-dom";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function AllProviders({
-  children
+  children,
+  withRouter = true
 }: {
   children: React.ReactNode;
+  withRouter?: boolean;
 }) {
+  const content = withRouter ? <MemoryRouter>{children}</MemoryRouter> : children;
+
   return (
     <ChakraProvider value={defaultSystem}>
-      <MemoryRouter>{children}</MemoryRouter>
+      {content}
     </ChakraProvider>
   );
 }
 
-export function renderWithProviders(ui: React.ReactElement) {
-  return render(ui, { wrapper: AllProviders });
+type ProviderRenderOptions = RenderOptions & {
+  withRouter?: boolean;
+};
+
+export function renderWithProviders(
+  ui: React.ReactElement,
+  { withRouter = true, ...renderOptions }: ProviderRenderOptions = {}
+) {
+  function Wrapper({ children }: { children: React.ReactNode }) {
+    return <AllProviders withRouter={withRouter}>{children}</AllProviders>;
+  }
+
+  return render(ui, { wrapper: Wrapper, ...renderOptions });
 }
