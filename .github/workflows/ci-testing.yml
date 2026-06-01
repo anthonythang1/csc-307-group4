@@ -14,5 +14,3 @@ jobs:
           node-version: 20
       - run: npm ci
       - run: cd packages/react-ts-frontend && npm run test
-      - run: npm run frontend
-      - run: npm run backend
