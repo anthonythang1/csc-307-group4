@@ -1,24 +1,21 @@
 package com.slorentalregistry.backend.database;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SupabaseDatabase {
 
+  private final DataSource dataSource;
   private final String dbPassword;
-  private final String dbUrl;
-  private final String dbUser;
 
   public SupabaseDatabase(
-      @Value("${app.supabase.db-url}") String dbUrl,
-      @Value("${app.supabase.db-user}") String dbUser,
+      DataSource dataSource,
       @Value("${app.supabase.db-password}") String dbPassword) {
-    this.dbUrl = dbUrl;
-    this.dbUser = dbUser;
+    this.dataSource = dataSource;
     this.dbPassword = dbPassword;
   }
 
@@ -27,6 +24,6 @@ public class SupabaseDatabase {
       throw new IllegalStateException("SUPABASE_DB_PASSWORD is not set.");
     }
 
-    return DriverManager.getConnection(dbUrl, dbUser, dbPassword);
+    return dataSource.getConnection();
   }
 }
