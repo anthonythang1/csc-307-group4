@@ -55,6 +55,18 @@ public class UserProfileService {
           true);
     }
   }
+  public boolean isCityOfficial(Jwt jwt) throws SQLException {
+  UUID authUserId = UUID.fromString(jwt.getSubject());
+
+  try (Connection conn = database.connect()) {
+    return findCityOfficial(
+            conn,
+            authUserId,
+            jwt.getClaimAsString("email"),
+            jwt)
+        != null;
+  }
+}
 
   private AuthenticatedUserResponse findCityOfficial(
       Connection conn, UUID authUserId, String email, Jwt jwt)

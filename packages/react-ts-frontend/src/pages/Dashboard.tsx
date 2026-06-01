@@ -1,42 +1,11 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { apiFetch } from "../lib/api";
-
-type DashboardStats = {
-  totalRegisteredProperties: number;
-  totalCities: number;
-  averageBeds: number;
-  averageBaths: number;
-  averageSqft: number;
-};
-
-type PropertiesByCity = {
-  city: string;
-  propertyCount: number;
-};
-
-type BedroomDistribution = {
-  label: string;
-  count: number;
-};
-
-type DashboardInsight = {
-  title: string;
-  description: string;
-  type: string;
-};
-
-type DashboardData = {
-  stats: DashboardStats;
-  propertiesByCity: PropertiesByCity[];
-  bedroomDistribution: BedroomDistribution[];
-  insights: DashboardInsight[];
-};
-
-type ApiErrorBody = {
-  error?: string;
-  message?: string;
-};
+import {
+  getDashboardData,
+  type BedroomDistribution,
+  type DashboardData,
+  type PropertiesByCity,
+} from "../api/dashboard";
 
 const styles: Record<string, CSSProperties> = {
   page: {
@@ -56,10 +25,6 @@ const styles: Record<string, CSSProperties> = {
   headerInner: {
     maxWidth: "1180px",
     margin: "0 auto",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: "24px",
   },
 
   backLink: {
@@ -83,15 +48,6 @@ const styles: Record<string, CSSProperties> = {
     marginBottom: 0,
     color: "#64748b",
     fontSize: "16px",
-  },
-
-  badge: {
-    marginTop: "44px",
-    borderRadius: "10px",
-    padding: "12px 14px",
-    backgroundColor: "#f1f5f9",
-    color: "#111827",
-    fontSize: "14px",
   },
 
   main: {
@@ -158,34 +114,6 @@ const styles: Record<string, CSSProperties> = {
     marginBottom: 0,
     color: "#16a34a",
     fontSize: "13px",
-  },
-
-  tabs: {
-    display: "inline-flex",
-    alignItems: "center",
-    backgroundColor: "#e9ebf0",
-    borderRadius: "999px",
-    padding: "4px",
-    marginBottom: "34px",
-  },
-
-  tabActive: {
-    border: "none",
-    backgroundColor: "#ffffff",
-    borderRadius: "999px",
-    padding: "8px 14px",
-    fontSize: "14px",
-    color: "#111827",
-    boxShadow: "0 1px 3px rgba(15, 23, 42, 0.12)",
-  },
-
-  tab: {
-    border: "none",
-    backgroundColor: "transparent",
-    borderRadius: "999px",
-    padding: "8px 14px",
-    fontSize: "14px",
-    color: "#111827",
   },
 
   chartGrid: {
@@ -259,50 +187,6 @@ const styles: Record<string, CSSProperties> = {
   },
 };
 
-async function readErrorMessage(
-  response: Response,
-  fallback: string
-): Promise<string> {
-  try {
-    const body = (await response.json()) as ApiErrorBody;
-    return body.error || body.message || fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-async function loadDashboardData(): Promise<DashboardData> {
-  const response = await apiFetch("/api/dashboard", {
-    method: "GET",
-  });
-
-  if (response.status === 401) {
-    throw new Error(
-      await readErrorMessage(
-        response,
-        "You must be logged in to view the dashboard."
-      )
-    );
-  }
-
-  if (response.status === 403) {
-    throw new Error(
-      await readErrorMessage(
-        response,
-        "You do not have permission to view this dashboard."
-      )
-    );
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      await readErrorMessage(response, "Failed to load dashboard data.")
-    );
-  }
-
-  return (await response.json()) as DashboardData;
-}
-
 function formatNumber(value: number | undefined) {
   return value === undefined ? "—" : value.toLocaleString();
 }
@@ -334,18 +218,12 @@ function PropertiesByCityChart({ data }: { data: PropertiesByCity[] }) {
   }
 
   const visibleData = data.slice(0, 8);
-  const maxCount = Math.max(
-    ...visibleData.map((item) => item.propertyCount),
-    1
-  );
+  const maxCount = Math.max(...visibleData.map((item) => item.propertyCount), 1);
 
   return (
     <div style={styles.barChart}>
       {visibleData.map((item) => {
-        const heightPercent = Math.max(
-          (item.propertyCount / maxCount) * 100,
-          4
-        );
+        const heightPercent = Math.max((item.propertyCount / maxCount) * 100, 4);
 
         return (
           <div
@@ -391,24 +269,12 @@ function PropertiesByCityChart({ data }: { data: PropertiesByCity[] }) {
   );
 }
 
-function BedroomDistributionChart({
-  data,
-}: {
-  data: BedroomDistribution[];
-}) {
+function BedroomDistributionChart({ data }: { data: BedroomDistribution[] }) {
   if (data.length === 0) {
     return <p style={styles.message}>No bedroom distribution data available.</p>;
   }
 
-  const colors = [
-    "#3b82f6",
-    "#22c55e",
-    "#f59e0b",
-    "#ef4444",
-    "#8b5cf6",
-    "#06b6d4",
-  ];
-
+  const colors = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"];
   const total = data.reduce((sum, item) => sum + item.count, 0);
 
   let start = 0;
@@ -441,8 +307,7 @@ function BedroomDistributionChart({
 
       <div style={styles.legend}>
         {data.map((item, index) => {
-          const percent =
-            total === 0 ? 0 : Math.round((item.count / total) * 100);
+          const percent = total === 0 ? 0 : Math.round((item.count / total) * 100);
 
           return (
             <div key={item.label} style={styles.legendRow}>
@@ -468,9 +333,7 @@ function BedroomDistributionChart({
 }
 
 function Dashboard() {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
-    null
-  );
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -482,16 +345,14 @@ function Dashboard() {
         setLoading(true);
         setError("");
 
-        const data = await loadDashboardData();
+        const data = await getDashboardData();
 
         if (!ignore) {
           setDashboardData(data);
         }
       } catch (err) {
         if (!ignore) {
-          setError(
-            err instanceof Error ? err.message : "Failed to load dashboard."
-          );
+          setError(err instanceof Error ? err.message : "Failed to load dashboard.");
         }
       } finally {
         if (!ignore) {
@@ -513,26 +374,19 @@ function Dashboard() {
     <div style={styles.page}>
       <header style={styles.header}>
         <div style={styles.headerInner}>
-          <div>
-            <Link to="/" style={styles.backLink}>
-              ← Back to Home
-            </Link>
+          <Link to="/" style={styles.backLink}>
+            ← Back to Home
+          </Link>
 
-            <h1 style={styles.title}>Policy Maker Analytics Dashboard</h1>
-            <p style={styles.subtitle}>
-              Property registry insights from the Supabase public.properties
-              table
-            </p>
-          </div>
-
-          <div style={styles.badge}>Protected dashboard</div>
+          <h1 style={styles.title}>Policy Maker Analytics Dashboard</h1>
+          <p style={styles.subtitle}>
+            Property registry insights from the Supabase public.properties table
+          </p>
         </div>
       </header>
 
       <main style={styles.main}>
-        {loading ? (
-          <p style={styles.message}>Loading dashboard data...</p>
-        ) : null}
+        {loading ? <p style={styles.message}>Loading dashboard data...</p> : null}
 
         {error ? <p style={styles.error}>{error}</p> : null}
 
@@ -566,18 +420,6 @@ function Dashboard() {
           />
         </section>
 
-        <div style={styles.tabs}>
-          <button type="button" style={styles.tabActive}>
-            Overview
-          </button>
-          <button type="button" style={styles.tab}>
-            Geographic Data
-          </button>
-          <button type="button" style={styles.tab}>
-            Property Mix
-          </button>
-        </div>
-
         <section style={styles.chartGrid}>
           <div style={styles.card}>
             <h2 style={styles.panelTitle}>Properties by City</h2>
@@ -585,9 +427,7 @@ function Dashboard() {
               Count of registered properties grouped by the city column
             </p>
 
-            <PropertiesByCityChart
-              data={dashboardData?.propertiesByCity ?? []}
-            />
+            <PropertiesByCityChart data={dashboardData?.propertiesByCity ?? []} />
           </div>
 
           <div style={styles.card}>
@@ -596,9 +436,7 @@ function Dashboard() {
               Breakdown of registered properties using the beds column
             </p>
 
-            <BedroomDistributionChart
-              data={dashboardData?.bedroomDistribution ?? []}
-            />
+            <BedroomDistributionChart data={dashboardData?.bedroomDistribution ?? []} />
           </div>
         </section>
 
