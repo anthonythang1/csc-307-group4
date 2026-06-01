@@ -26,39 +26,34 @@ public class UserProfileService {
 
   public AuthenticatedUserResponse resolveOrCreateLandlord(Jwt jwt)
       throws SQLException {
-    try (Connection conn = database.connect()) {
-      return resolveOrCreateLandlord(jwt, conn);
-    }
-  }
-
-  public AuthenticatedUserResponse resolveOrCreateLandlord(
-      Jwt jwt, Connection conn) throws SQLException {
     UUID authUserId = UUID.fromString(jwt.getSubject());
     String email = jwt.getClaimAsString("email");
 
-    AuthenticatedUserResponse cityOfficial =
-        findCityOfficial(conn, authUserId, email, jwt);
+    try (Connection conn = database.connect()) {
+      AuthenticatedUserResponse cityOfficial =
+          findCityOfficial(conn, authUserId, email, jwt);
 
-    if (cityOfficial != null) {
-      return cityOfficial;
+      if (cityOfficial != null) {
+        return cityOfficial;
+      }
+
+      AuthenticatedUserResponse landlord =
+          findLandlord(conn, authUserId, email, jwt);
+
+      if (landlord != null) {
+        return landlord;
+      }
+
+      int landlordId = createLandlord(conn, authUserId, email, jwt);
+      return new AuthenticatedUserResponse(
+          authUserId.toString(),
+          email,
+          jwt.getClaimAsString("role"),
+          "LANDLORD",
+          landlordId,
+          null,
+          true);
     }
-
-    AuthenticatedUserResponse landlord =
-        findLandlord(conn, authUserId, email, jwt);
-
-    if (landlord != null) {
-      return landlord;
-    }
-
-    int landlordId = createLandlord(conn, authUserId, email, jwt);
-    return new AuthenticatedUserResponse(
-        authUserId.toString(),
-        email,
-        jwt.getClaimAsString("role"),
-        "LANDLORD",
-        landlordId,
-        null,
-        true);
   }
 
   private AuthenticatedUserResponse findCityOfficial(
