@@ -9,8 +9,7 @@
     "coverage": "vitest run --coverage",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "postinstall": "chakra typegen src/theme.ts"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.35.0",
