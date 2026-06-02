@@ -2,7 +2,6 @@ import {
 	Box,
 	Button,
 	Card,
-	Center,
 	Heading,
 	HStack,
 	Text,
@@ -10,7 +9,7 @@ import {
 	Icon,
 	Avatar,
 	Container,
-	Flex
+	Flex,
 } from "@chakra-ui/react";
 
 import {
@@ -85,7 +84,7 @@ export default function Home() {
 		}
 	};
 
-	const greetStyle: SystemStyleObject = {
+	const greetStyle = {
 		textAlign: "center",
 		fontSize: "xl",
 		pt: "10vh",
@@ -98,7 +97,7 @@ export default function Home() {
 			w="100vw"
 			bgSize="cover"
 			bgRepeat="no-repeat"
-			bgPosition="center"
+			//bgPosition="center"
 			bgImage={`url(${bg})`} 
 		>
 			<Container as="section" maxWidth="4xl" maxHeight="2xl">
