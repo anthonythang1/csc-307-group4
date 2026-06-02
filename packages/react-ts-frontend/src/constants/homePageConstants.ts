@@ -1,8 +1,8 @@
-import Shield from "@/assets/shield.svg?react";
+//import Shield from "@/assets/shield.svg?react";
 import Verify from "@/assets/verify.svg?react";
 import Housing from "@/assets/housing.svg?react";
 import Landlord from "@/assets/landlord.svg?react";
-import Tenants from "@/assets/tenants.svg?react";
+//import Tenants from "@/assets/tenants.svg?react";
 
 export const PAGE_CONTENT = {
   heading: "San Luis Obispo Rental Registry",
