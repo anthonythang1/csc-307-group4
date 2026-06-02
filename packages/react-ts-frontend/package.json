@@ -9,10 +9,12 @@
     "coverage": "vitest run --coverage",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "postinstall": "chakra typegen src/theme.ts"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.35.0",
+    "@chakra-ui/theme-tools": "^2.2.6",
     "@emotion/react": "^11.14.0",
     "@supabase/supabase-js": "^2.105.3",
     "@tailwindcss/postcss": "^4.2.4",
@@ -22,6 +24,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@chakra-ui/cli": "^3.35.0",
     "@eslint/js": "^10.0.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

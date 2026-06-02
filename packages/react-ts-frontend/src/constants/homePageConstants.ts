@@ -6,34 +6,32 @@ import Tenants from "@/assets/tenants.svg?react";
 
 export const PAGE_CONTENT = {
   heading: "San Luis Obispo Rental Registry",
-  body: "A trusted registry that helps prevent rental scams, verifies legitimate landlords, and provides valuable housing data to the community.",
+  body: "A secure registry that aggregates landlord-provided housing data to give policymakers an accurate, up-to-date picture of the housing stock.",
   secondHeading: "How it Works"
 };
 
 export const FEATURE_CARDS = [
   {
-    id: "scam",
-    title: "Prevent Scams",
+    id: "point1",
+    title: "Data Collection",
     desc:
-      "Verify landlords are legitimate before signing a lease. " +
-      "Check registration status and protect yourself from bad actors.",
-    icon: Shield
+      "Store property and lease information voluntarily provided by landlords.", 
+    icon: Verify 
   },
   {
-    id: "verify",
-    title: "Verify Landlords",
+    id: "point2",
+    title: "Aid Landlords",
     desc:
-      "Tenants can easily check if their potential landlord is " +
-      "registered with the city and their record.",
+      "Give landlords the ability to track their properties and leases with the city." ,
     icon: Verify
   },
   {
-    id: "housing",
-    title: "Tracking Housing Data",
+    id: "point3",
+    title: "Housing Situation",
     desc:
-      "Help the city understand rental trends, property distribution," +
+      "Help city policymakers understand rental trends, property distribution," +
       " and housing needs across San Luis Obispo.",
-    icon: Housing
+    icon: Verify 
   }
 ];
 
@@ -44,20 +42,19 @@ export const USER_TYPES = [
     icon: Landlord,
     color: "blue",
     steps: [
-      "Register your rental properties with the city",
-      "Provide property details and contact information",
-      "Receive verification and build trust with tenants"
+		"Register an account in the registry",
+      	"Register your properties or leases in the registry",
+		"Continue to update information when changes happen"
     ]
   },
   {
-    id: "tenant",
-    title: "For Tenants",
-    icon: Tenants,
+    id: "cityauth",
+    title: "For City Authority",
+    icon: Housing,
     color: "green",
     steps: [
-      "Search for your landlord or property address",
-      "Verify registration status before signing a lease",
-      "Report any issues or suspicious activity"
+      "Login using City Employee Account",
+      "Access summary analytics through dashboard."
     ]
   }
 ];
