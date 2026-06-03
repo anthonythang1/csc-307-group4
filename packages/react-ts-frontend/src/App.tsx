@@ -8,6 +8,7 @@ import Home from "./pages/Home.tsx";
 import LandlordProperties from "./pages/LandlordProperties.tsx";
 import Login from "./pages/Login.tsx";
 import PropertyRegisterLL from "./pages/Form_PropRegLandlord.tsx"; 
+import Dashboard from './pages/Dashboard.tsx';
 //import LeaseRegister from "./pages/Form_LeaseReg.tsx"; 
 
 type UserProfile = {
@@ -104,6 +105,7 @@ export default function App() {
 				<Route path="/" element={<DefaultRoute />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Login startOnSignUp />} />
+				<Route path="/dashboard" element={<Dashboard />} />
 				<Route
 					path="/propertyreg"
 					element={
