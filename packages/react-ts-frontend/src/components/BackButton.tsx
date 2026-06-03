@@ -20,6 +20,7 @@ export default function BackButton() {
 
 	return (
 		<Button
+			textStyle="3xl"
 			aria-label="Go back"
 			title="Go back"
 			type="button"
@@ -27,8 +28,7 @@ export default function BackButton() {
 			top="4"
 			left="4"
 			zIndex="1000"
-			variant="outline"
-			colorPalette="blue"
+			bg="blue"
 			minW="10"
 			onClick={handleBack}>
 			&larr;
