@@ -1,5 +1,4 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { Link } from "react-router-dom";
 import {
   getDashboardData,
   type BedroomDistribution,
@@ -27,27 +26,12 @@ const styles: Record<string, CSSProperties> = {
     margin: "0 auto",
   },
 
-  backLink: {
-    display: "inline-block",
-    color: "#2563eb",
-    textDecoration: "none",
-    fontSize: "14px",
-    marginBottom: "10px",
-  },
-
   title: {
     margin: 0,
     fontSize: "30px",
     lineHeight: "1.1",
     fontWeight: 800,
     letterSpacing: "-0.04em",
-  },
-
-  subtitle: {
-    marginTop: "10px",
-    marginBottom: 0,
-    color: "#475569",
-    fontSize: "16px",
   },
 
   main: {
@@ -408,14 +392,8 @@ function Dashboard() {
     <div style={styles.page}>
       <header style={styles.header}>
         <div style={styles.headerInner}>
-          <Link to="/" style={styles.backLink}>
-            ← Back to Home
-          </Link>
 
-          <h1 style={styles.title}>Policy Maker Analytics Dashboard</h1>
-          <p style={styles.subtitle}>
-            Property registry insights from the Supabase public.properties table
-          </p>
+          <h1 style={styles.title}>Analytics Dashboard</h1>
         </div>
       </header>
 
