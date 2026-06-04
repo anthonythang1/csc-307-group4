@@ -23,7 +23,7 @@ export default function Login({ startOnSignUp = false }: LoginProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const redirectTo =
-    (location.state as LoginLocationState | null)?.from?.pathname ?? '/';
+    (location.state as LoginLocationState | null)?.from?.pathname ?? '/dashboard';
   const [showSignUp, setShowSignUp] = useState(startOnSignUp);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
