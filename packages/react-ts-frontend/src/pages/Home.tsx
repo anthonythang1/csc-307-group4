@@ -20,7 +20,7 @@ import {
 import { useAuth } from "@/auth/useAuth";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import bg from "../assets/slo.jpg"
+import bg from "../assets/slo.jpg";
 
 type CardProps = {
 	title: string;
@@ -159,6 +159,8 @@ export default function Home() {
 					<Flex gap="8" justify="space-between">
 						{USER_TYPES.map((type) => (
 							<Card.Root
+								maxW="350px"
+								p="4"
 								key={type.id}
 								size="lg"
 								colorPalette={type.color}
