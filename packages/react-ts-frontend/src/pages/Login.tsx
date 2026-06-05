@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
+import { fetchUserProfile, getLoginRedirectPath } from '../auth/userProfile';
 import { firstZodErrorMessage, loginSchema } from '../lib/formValidation';
 import { SignUpForm } from './SignUpForm';
 import { Box, Button, Container, Center, Text, Flex} from "@chakra-ui/react"; 
@@ -24,8 +25,8 @@ export default function Login({ startOnSignUp = false }: LoginProps) {
 	const { isConfigured, signInWithPassword, user } = useAuth();
 	const location = useLocation();
 	const navigate = useNavigate();
-	const redirectTo =
-		(location.state as LoginLocationState | null)?.from?.pathname ?? '/dashboard';
+	const requestedPath =
+		(location.state as LoginLocationState | null)?.from?.pathname;
 	const [showSignUp, setShowSignUp] = useState(startOnSignUp);
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -47,7 +48,8 @@ export default function Login({ startOnSignUp = false }: LoginProps) {
 
 		try {
 			await signInWithPassword(validated.data.email, validated.data.password);
-			navigate(redirectTo, { replace: true });
+			const profile = await fetchUserProfile();
+			navigate(getLoginRedirectPath(profile, requestedPath), { replace: true });
 		} 
 		catch (err) {
 			setError(getErrorMessage(err));
@@ -58,7 +60,7 @@ export default function Login({ startOnSignUp = false }: LoginProps) {
 	};
 
 	if (user) {
-		return <Navigate to={redirectTo} replace />;
+		return <Navigate to="/" replace />;
 	}
 
 	if (showSignUp) {

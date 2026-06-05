@@ -5,6 +5,8 @@ import {
   type DashboardData,
   type PropertiesByCity,
 } from "../api/dashboard";
+import { useAuth } from "../auth/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const styles: Record<string, CSSProperties> = {
   page: {
@@ -24,6 +26,11 @@ const styles: Record<string, CSSProperties> = {
   headerInner: {
     maxWidth: "1180px",
     margin: "0 auto",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "20px",
+    flexWrap: "wrap",
   },
 
   title: {
@@ -32,6 +39,34 @@ const styles: Record<string, CSSProperties> = {
     lineHeight: "1.1",
     fontWeight: 800,
     letterSpacing: "-0.04em",
+  },
+
+  signOutArea: {
+    textAlign: "right",
+  },
+
+  signOutButton: {
+    appearance: "none",
+    backgroundColor: "#ffffff",
+    border: "1px solid #cbd5e1",
+    borderRadius: "8px",
+    color: "#0f172a",
+    cursor: "pointer",
+    fontSize: "14px",
+    fontWeight: 600,
+    padding: "9px 14px",
+  },
+
+  signOutButtonDisabled: {
+    cursor: "not-allowed",
+    opacity: 0.65,
+  },
+
+  signOutError: {
+    marginTop: "8px",
+    marginBottom: 0,
+    color: "#dc2626",
+    fontSize: "13px",
   },
 
   main: {
@@ -214,6 +249,10 @@ function formatNumber(value: number | undefined) {
   return value === undefined ? "—" : value.toLocaleString();
 }
 
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Something went wrong.";
+}
+
 type StatCardProps = {
   title: string;
   value: string;
@@ -351,9 +390,13 @@ function BedroomDistributionChart({ data }: { data: BedroomDistribution[] }) {
 }
 
 function Dashboard() {
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState("");
 
   useEffect(() => {
     let ignore = false;
@@ -388,12 +431,41 @@ function Dashboard() {
 
   const stats = dashboardData?.stats;
 
+  const handleSignOut = async () => {
+    setSignOutError("");
+    setSigningOut(true);
+
+    try {
+      await signOut();
+      navigate("/", { replace: true });
+    } catch (err) {
+      setSignOutError(getErrorMessage(err));
+      setSigningOut(false);
+    }
+  };
+
   return (
     <div style={styles.page}>
       <header style={styles.header}>
         <div style={styles.headerInner}>
-
           <h1 style={styles.title}>Analytics Dashboard</h1>
+
+          <div style={styles.signOutArea}>
+            <button
+              disabled={signingOut}
+              onClick={() => void handleSignOut()}
+              style={{
+                ...styles.signOutButton,
+                ...(signingOut ? styles.signOutButtonDisabled : {}),
+              }}
+              type="button"
+            >
+              {signingOut ? "Signing out..." : "Sign Out"}
+            </button>
+            {signOutError ? (
+              <p style={styles.signOutError}>{signOutError}</p>
+            ) : null}
+          </div>
         </div>
       </header>
 
