@@ -83,10 +83,10 @@ public class DashboardService {
     String sql =
         """
         SELECT
-          COALESCE(NULLIF(TRIM(city), ''), 'Unknown') AS city,
-          COUNT(*)::int AS property_count
+        INITCAP(LOWER(COALESCE(NULLIF(TRIM(city), ''), 'Unknown'))) AS city,
+        COUNT(*)::int AS property_count
         FROM public.properties
-        GROUP BY COALESCE(NULLIF(TRIM(city), ''), 'Unknown')
+        GROUP BY LOWER(COALESCE(NULLIF(TRIM(city), ''), 'Unknown'))
         ORDER BY property_count DESC, city ASC
         """;
 
