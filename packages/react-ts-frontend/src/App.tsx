@@ -1,9 +1,8 @@
-import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from "./auth/ProtectedRoute.tsx";
 import BackButton from "./components/BackButton.tsx";
-import { useAuth } from "./auth/useAuth.ts";
-import { apiFetch } from "./lib/api.ts";
+import { useUserProfile } from "./auth/useUserProfile.ts";
+import { getDefaultPathForProfile } from "./auth/userProfile.ts";
 import Home from "./pages/Home.tsx";
 import LandlordProperties from "./pages/LandlordProperties.tsx";
 import Login from "./pages/Login.tsx";
@@ -11,72 +10,8 @@ import PropertyRegisterLL from "./pages/Form_PropRegLandlord.tsx";
 import Dashboard from './pages/Dashboard.tsx';
 //import LeaseRegister from "./pages/Form_LeaseReg.tsx"; 
 
-type UserProfile = {
-	registryRole: "CITY_OFFICIAL" | "LANDLORD" | string;
-	userId: string;
-};
-
-type ProfileLoadState = {
-	error: string;
-	profile: UserProfile | null;
-	userId: string;
-};
-
-async function fetchUserProfile() {
-	const response = await apiFetch("/api/me");
-
-	if (!response.ok) {
-		throw new Error("Could not load user profile.");
-	}
-
-	return (await response.json()) as UserProfile;
-}
-
 function DefaultRoute() {
-	const { loading, user } = useAuth();
-	const [profileState, setProfileState] = useState<ProfileLoadState | null>(null);
-	const currentProfileState =
-		profileState?.userId === user?.id ? profileState : null;
-
-	useEffect(() => {
-		if (!user) {
-			return undefined;
-		}
-
-		let ignore = false;
-		const userId = user.id;
-
-		async function loadProfile() {
-			try {
-				const loadedProfile = await fetchUserProfile();
-
-				if (!ignore) {
-					setProfileState({
-						error: "",
-						profile: loadedProfile,
-						userId
-					});
-				}
-			} catch (error) {
-				if (!ignore) {
-					setProfileState({
-						error:
-							error instanceof Error
-								? error.message
-								: "Could not load user profile.",
-						profile: null,
-						userId
-					});
-				}
-			}
-		}
-
-		void loadProfile();
-
-		return () => {
-			ignore = true;
-		};
-	}, [user]);
+	const { error, loading, profile, user } = useUserProfile();
 
 	if (loading) {
 		return <p>Loading...</p>;
@@ -86,12 +21,14 @@ function DefaultRoute() {
 		return <Home />;
 	}
 
-	if (!currentProfileState) {
-		return <p>Loading...</p>;
+	if (error) {
+		return <Home />;
 	}
 
-	if (currentProfileState.profile?.registryRole === "LANDLORD") {
-		return <Navigate replace to="/landlord/properties" />;
+	const defaultPath = getDefaultPathForProfile(profile);
+
+	if (defaultPath !== "/") {
+		return <Navigate replace to={defaultPath} />;
 	}
 
 	return <Home />;
@@ -105,11 +42,18 @@ export default function App() {
 				<Route path="/" element={<DefaultRoute />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Login startOnSignUp />} />
-				<Route path="/dashboard" element={<Dashboard />} />
+				<Route
+					path="/dashboard"
+					element={
+						<ProtectedRoute allowedRoles={["CITY_OFFICIAL"]}>
+							<Dashboard />
+						</ProtectedRoute>
+					}
+				/>
 				<Route
 					path="/propertyreg"
 					element={
-						<ProtectedRoute>
+						<ProtectedRoute allowedRoles={["LANDLORD"]}>
 							<PropertyRegisterLL />
 						</ProtectedRoute>
 					}
@@ -117,12 +61,12 @@ export default function App() {
 				<Route
 					path="/landlord/properties"
 					element={
-						<ProtectedRoute>
+						<ProtectedRoute allowedRoles={["LANDLORD"]}>
 							<LandlordProperties />
 						</ProtectedRoute>
 					}
 				/>
 			</Routes>
-</BrowserRouter>
-);
+		</BrowserRouter>
+	);
 }

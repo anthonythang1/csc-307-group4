@@ -5,7 +5,11 @@ export default function BackButton() {
 	const location = useLocation();
 	const navigate = useNavigate();
 
-	if (location.pathname === "/" || location.pathname === "/landlord/properties") {
+	if (
+		location.pathname === "/" ||
+		location.pathname === "/dashboard" ||
+		location.pathname === "/landlord/properties"
+	) {
 		return null;
 	}
 
